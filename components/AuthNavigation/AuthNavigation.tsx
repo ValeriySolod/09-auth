@@ -50,9 +50,9 @@ export default function AuthNavigation() {
   return (
     <>
       <li className={css.navigationItem}>
-        <Link href="/profile" prefetch={false} className={css.navigationLink}>
-          Profile
-        </Link>
+       <Link href="/sign-up" prefetch={false} className={css.navigationLink}>
+  Register
+</Link> 
       </li>
 
       <li className={css.navigationItem}>
