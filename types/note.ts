@@ -8,3 +8,5 @@ export interface Note {
   createdAt: string;
   updatedAt: string;
 }
+
+export type CreateNoteData = Pick<Note, 'title' | 'content' | 'tag'>;
