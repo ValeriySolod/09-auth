@@ -20,14 +20,18 @@ export default function EditProfilePage() {
   }, [user]);
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+  event.preventDefault();
 
+  try {
     const updatedUser = await updateMe({ username });
     setUser(updatedUser);
 
     router.push('/profile');
     router.refresh();
-  };
+  } catch {
+    console.error('Failed to update profile');
+  }
+};
 
   const handleCancel = () => {
     router.push('/profile');
