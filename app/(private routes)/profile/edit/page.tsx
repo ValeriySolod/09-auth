@@ -1,6 +1,6 @@
 'use client';
 
-import { FormEvent, useEffect, useState } from 'react';
+import { FormEvent, useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { updateMe } from '@/lib/api/clientApi';
@@ -11,13 +11,8 @@ export default function EditProfilePage() {
   const router = useRouter();
   const user = useAuthStore((state) => state.user);
   const setUser = useAuthStore((state) => state.setUser);
-  const [username, setUsername] = useState('');
 
-  useEffect(() => {
-    if (user?.username) {
-      setUsername(user.username);
-    }
-  }, [user]);
+  const [username, setUsername] = useState(user?.username ?? '');
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();

@@ -1,48 +1,77 @@
-import type { Metadata } from 'next';
+'use client';
+
+import { FormEvent, useState } from 'react';
 import Image from 'next/image';
-import Link from 'next/link';
-import { redirect } from 'next/navigation';
-import { checkSession, getMe } from '@/lib/api/serverApi';
-import css from './ProfilePage.module.css';
+import { useRouter } from 'next/navigation';
+import { updateMe } from '@/lib/api/clientApi';
+import { useAuthStore } from '@/lib/store/authStore';
+import css from './EditProfilePage.module.css';
 
-export const metadata: Metadata = {
-  title: 'Profile | NoteHub',
-  description: 'User profile page',
-};
+export default function EditProfilePage() {
+  const router = useRouter();
+  const user = useAuthStore((state) => state.user);
+  const setUser = useAuthStore((state) => state.setUser);
 
-export default async function ProfilePage() {
-  const session = await checkSession();
+  const [username, setUsername] = useState(user?.username ?? '');
 
-  if (!session.success) {
-    redirect('/sign-in');
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    const updatedUser = await updateMe({ username });
+    setUser(updatedUser);
+
+    router.push('/profile');
+    router.refresh();
+  };
+
+  const handleCancel = () => {
+    router.push('/profile');
+  };
+
+  if (!user) {
+    return null;
   }
-
-  const user = await getMe();
 
   return (
     <main className={css.mainContent}>
       <div className={css.profileCard}>
-        <div className={css.header}>
-          <h1 className={css.formTitle}>Profile Page</h1>
-          <Link href="/profile/edit" className={css.editProfileButton}>
-            Edit Profile
-          </Link>
-        </div>
+        <h1 className={css.formTitle}>Edit Profile</h1>
 
-        <div className={css.avatarWrapper}>
-          <Image
-            src={user.avatar}
-            alt="User Avatar"
-            width={120}
-            height={120}
-            className={css.avatar}
-          />
-        </div>
+        <Image
+          src={user.avatar}
+          alt="User Avatar"
+          width={120}
+          height={120}
+          className={css.avatar}
+        />
 
-        <div className={css.profileInfo}>
-          <p>Username: {user.username}</p>
+        <form className={css.profileInfo} onSubmit={handleSubmit}>
+          <div className={css.usernameWrapper}>
+            <label htmlFor="username">Username:</label>
+            <input
+              id="username"
+              type="text"
+              className={css.input}
+              value={username}
+              onChange={(event) => setUsername(event.target.value)}
+            />
+          </div>
+
           <p>Email: {user.email}</p>
-        </div>
+
+          <div className={css.actions}>
+            <button type="submit" className={css.saveButton}>
+              Save
+            </button>
+            <button
+              type="button"
+              className={css.cancelButton}
+              onClick={handleCancel}
+            >
+              Cancel
+            </button>
+          </div>
+        </form>
       </div>
     </main>
   );
