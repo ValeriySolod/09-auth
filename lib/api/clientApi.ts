@@ -28,6 +28,10 @@ interface UpdateUserData {
   username: string;
 }
 
+interface CheckSessionResponse {
+  success: boolean;
+}
+
 export const fetchNotes = async ({
   page = 1,
   search = '',
@@ -74,8 +78,8 @@ export const logout = async (): Promise<void> => {
   await api.post('/auth/logout');
 };
 
-export const checkSession = async (): Promise<User | null> => {
-  const { data } = await api.get<User | null>('/auth/session');
+export const checkSession = async (): Promise<CheckSessionResponse> => {
+  const { data } = await api.get<CheckSessionResponse>('/auth/session');
   return data;
 };
 

@@ -1,28 +1,22 @@
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
-import { getMe } from '@/lib/api/serverApi';
+import { redirect } from 'next/navigation';
+import { checkSession, getMe } from '@/lib/api/serverApi';
 import css from './ProfilePage.module.css';
 
 export const metadata: Metadata = {
   title: 'Profile | NoteHub',
   description: 'User profile page',
-  openGraph: {
-    title: 'Profile | NoteHub',
-    description: 'User profile page',
-    url: '/profile',
-    images: [
-      {
-        url: '/opengraph-image.png',
-        width: 1200,
-        height: 630,
-        alt: 'NoteHub profile page',
-      },
-    ],
-  },
 };
 
 export default async function ProfilePage() {
+  const session = await checkSession();
+
+  if (!session.success) {
+    redirect('/sign-in');
+  }
+
   const user = await getMe();
 
   return (

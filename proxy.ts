@@ -19,18 +19,15 @@ export async function proxy(request: NextRequest) {
   let isAuthenticated = false;
 
   try {
-    const response = await fetch(
-      `${request.nextUrl.origin}/api/auth/session`,
-      {
-        headers: {
-          Cookie: cookie,
-        },
-      }
-    );
+    const response = await fetch(`${request.nextUrl.origin}/api/auth/session`, {
+      headers: {
+        Cookie: cookie,
+      },
+    });
 
     if (response.ok) {
-      const data = await response.json().catch(() => null);
-      isAuthenticated = Boolean(data);
+      const data: { success: boolean } = await response.json();
+      isAuthenticated = data.success;
     }
   } catch {
     isAuthenticated = false;

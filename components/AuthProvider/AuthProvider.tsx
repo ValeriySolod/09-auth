@@ -19,7 +19,7 @@ export default function AuthProvider({ children }: AuthProviderProps) {
       try {
         const session = await checkSession();
 
-        if (!session) {
+        if (!session.success) {
           clearIsAuthenticated();
           return;
         }
