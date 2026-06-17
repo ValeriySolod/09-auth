@@ -35,7 +35,7 @@ export async function GET(request: NextRequest) {
           error: error.message,
           response: error.response?.data,
         },
-        { status: error.response?.status ?? 500 }
+        { status: error.status ?? 500 }
       );
     }
 
@@ -62,17 +62,17 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(res.data, { status: res.status });
   } catch (error) {
-   if (isAxiosError(error)) {
-  logErrorResponse(error.response?.data);
+    if (isAxiosError(error)) {
+      logErrorResponse(error.response?.data);
 
-  return NextResponse.json(
-    {
-      error: error.message,
-      response: error.response?.data,
-    },
-    { status: error.status ?? 500 }
-  );
-}
+      return NextResponse.json(
+        {
+          error: error.message,
+          response: error.response?.data,
+        },
+        { status: error.status ?? 500 }
+      );
+    }
 
     logErrorResponse({ message: (error as Error).message });
 
