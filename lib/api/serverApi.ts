@@ -1,4 +1,5 @@
 import { cookies } from 'next/headers';
+import type { AxiosResponse } from 'axios';
 import { api } from './api';
 import type { Note } from '@/types/note';
 import type { User } from '@/types/user';
@@ -18,7 +19,7 @@ interface CheckSessionResponse {
   success: boolean;
 }
 
-const getCookieHeader = async () => {
+const getCookieHeader = async (): Promise<string> => {
   const cookieStore = await cookies();
   return cookieStore.toString();
 };
@@ -34,8 +35,8 @@ export const fetchNotes = async ({
     params: {
       page,
       perPage: 12,
-      search,
-      tag,
+      ...(search !== '' && { search }),
+      ...(tag && tag !== 'All' && { tag }),
     },
     headers: {
       Cookie: cookieHeader,
@@ -69,14 +70,14 @@ export const getMe = async (): Promise<User> => {
   return data;
 };
 
-export const checkSession = async (): Promise<CheckSessionResponse> => {
+export const checkSession = async (): Promise<
+  AxiosResponse<CheckSessionResponse>
+> => {
   const cookieHeader = await getCookieHeader();
 
-  const { data } = await api.get<CheckSessionResponse>('/auth/session', {
+  return api.get<CheckSessionResponse>('/auth/session', {
     headers: {
       Cookie: cookieHeader,
     },
   });
-
-  return data;
 };

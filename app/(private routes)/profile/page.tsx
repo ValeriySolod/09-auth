@@ -11,11 +11,11 @@ export const metadata: Metadata = {
 };
 
 export default async function ProfilePage() {
-  const session = await checkSession();
+ const session = await checkSession();
 
-  if (!session.success) {
-    redirect('/sign-in');
-  }
+if (!session.data.success) {
+  redirect('/sign-in');
+}
 
   const user = await getMe();
 

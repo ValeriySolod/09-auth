@@ -1,20 +1,24 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { isAxiosError } from 'axios';
 import { api } from '../api';
 import { logErrorResponse } from '../_utils/utils';
 
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   try {
     const cookieStore = await cookies();
-    const { searchParams } = new URL(request.url);
+
+    const search = request.nextUrl.searchParams.get('search') ?? '';
+    const page = Number(request.nextUrl.searchParams.get('page') ?? 1);
+    const rawTag = request.nextUrl.searchParams.get('tag') ?? '';
+    const tag = rawTag === 'All' ? '' : rawTag;
 
     const res = await api('/notes', {
       params: {
-        page: searchParams.get('page') ?? '1',
-        perPage: searchParams.get('perPage') ?? '12',
-        search: searchParams.get('search') ?? '',
-        tag: searchParams.get('tag') ?? undefined,
+        ...(search !== '' && { search }),
+        page,
+        perPage: 12,
+        ...(tag && { tag }),
       },
       headers: {
         Cookie: cookieStore.toString(),
@@ -27,7 +31,10 @@ export async function GET(request: Request) {
       logErrorResponse(error.response?.data);
 
       return NextResponse.json(
-        { error: error.message, response: error.response?.data },
+        {
+          error: error.message,
+          response: error.response?.data,
+        },
         { status: error.response?.status ?? 500 }
       );
     }
@@ -41,7 +48,7 @@ export async function GET(request: Request) {
   }
 }
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
     const cookieStore = await cookies();
     const body = await request.json();
@@ -49,6 +56,7 @@ export async function POST(request: Request) {
     const res = await api.post('/notes', body, {
       headers: {
         Cookie: cookieStore.toString(),
+        'Content-Type': 'application/json',
       },
     });
 
@@ -58,7 +66,10 @@ export async function POST(request: Request) {
       logErrorResponse(error.response?.data);
 
       return NextResponse.json(
-        { error: error.message, response: error.response?.data },
+        {
+          error: error.message,
+          response: error.response?.data,
+        },
         { status: error.response?.status ?? 500 }
       );
     }
